@@ -33,7 +33,7 @@ tradesignal-web/
 ## 🎯 Current Status
 
 **Phase:** MVP Development (Week 1)  
-**Version:** 0.1.0 (Initial Setup)
+**Version:** 0.2.0 (Core Features)
 
 ### ✅ Completed
 - [x] Next.js project setup with TypeScript
@@ -43,11 +43,17 @@ tradesignal-web/
 - [x] Basic navigation layout
 - [x] Homepage with hero section
 - [x] Feature cards (Instant Analysis, SMART Engine, Track Record)
+- [x] **Chart upload page (/analyze route)**
+- [x] **Drag & drop file upload with preview**
+- [x] **File validation (type + size limits)**
+- [x] **Analysis API route (/api/analyze)**
+- [x] **Backend integration (TradeSignal bot)**
+- [x] **Results display (Technical + SMART)**
 
 ### 🚧 In Progress
-- [ ] Chart upload interface
-- [ ] Analysis display page
-- [ ] Backend integration
+- [ ] Backend connection testing
+- [ ] Error handling polish
+- [ ] Mobile responsive refinement
 
 ### 📋 Roadmap
 

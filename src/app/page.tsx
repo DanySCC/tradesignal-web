@@ -2,6 +2,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, Zap, Shield } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -35,8 +36,8 @@ export default function Home() {
           </div>
           
           <div className="flex gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8">
-              Analyze Chart Now
+            <Button size="lg" className="text-lg px-8" asChild>
+              <Link href="/analyze">Analyze Chart Now</Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8">
               View Daily Picks
