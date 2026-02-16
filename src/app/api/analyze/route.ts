@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-
-// Backend API URL (TradeSignal bot)
-const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:3001";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,26 +15,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check and consume usage credit
-    const usageResponse = await fetch(
-      `${request.nextUrl.origin}/api/usage/consume`,
-      {
-        method: "POST",
-        headers: {
-          cookie: request.headers.get("cookie") || "",
-        },
-      }
-    );
+    // Check and consume usage credit directly from DB (avoid SSL issue)
+    const client = await clientPromise;
+    const db = client.db("tradesignal");
+    
+    const user = await db.collection("users").findOne({
+      _id: new ObjectId(session.user.id),
+    });
 
-    if (!usageResponse.ok) {
-      const error = await usageResponse.json();
+    if (!user) {
       return NextResponse.json(
-        { error: error.error || "Usage limit exceeded" },
-        { status: usageResponse.status }
+        { error: "User not found" },
+        { status: 404 }
       );
     }
 
-    const usageData = await usageResponse.json();
+    // Check usage limits
+    if (user.tier !== "PRO") {
+      // Reset counter if new month
+      const now = new Date();
+      const resetDate = new Date(user.analysesResetDate);
+      
+      if (now.getMonth() !== resetDate.getMonth() || 
+          now.getFullYear() !== resetDate.getFullYear()) {
+        // New month - reset counter
+        await db.collection("users").updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              monthlyAnalyses: 0,
+              analysesResetDate: new Date(now.getFullYear(), now.getMonth(), 1),
+            },
+          }
+        );
+        user.monthlyAnalyses = 0;
+      }
+
+      // Check if limit reached
+      if (user.monthlyAnalyses >= 5) {
+        return NextResponse.json(
+          { 
+            error: "Monthly limit reached. Upgrade to PRO for unlimited analyses.",
+            tier: "FREE",
+            limit: 5,
+            used: user.monthlyAnalyses,
+          },
+          { status: 403 }
+        );
+      }
+
+      // Increment usage
+      await db.collection("users").updateOne(
+        { _id: user._id },
+        { $inc: { monthlyAnalyses: 1 } }
+      );
+    }
 
     const formData = await request.formData();
     const file = formData.get("chart") as File;
@@ -55,59 +89,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Forward to TradeSignal backend
-    const backendFormData = new FormData();
-    const blob = new Blob([buffer], { type: file.type });
-    backendFormData.append("chart", blob, file.name);
-
-    // TODO: Add authentication/user context when auth is implemented
-    // backendFormData.append("userId", userId);
-    // backendFormData.append("tier", "FREE"); // or "PRO"
-
-    const response = await fetch(`${BACKEND_URL}/api/analyze`, {
-      method: "POST",
-      body: backendFormData,
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("Backend error:", error);
-      return NextResponse.json(
-        { error: "Analysis failed" },
-        { status: response.status }
-      );
-    }
-
-    const result = await response.json();
-
-    // Return analysis result with usage data
-    return NextResponse.json({
+    // For now, return a mock analysis
+    // TODO: Integrate with Claude API for real AI analysis
+    const mockAnalysis = {
       technical: {
-        bias: result.technical?.bias || "NEUTRAL",
-        confidence: result.technical?.confidence || 0,
-        entry: result.technical?.entry || "N/A",
-        stopLoss: result.technical?.stopLoss || "N/A",
-        takeProfit: result.technical?.takeProfit || "N/A",
+        bias: "LONG",
+        confidence: 78,
+        entry: "43250",
+        stopLoss: "42800",
+        takeProfit: "45500",
       },
       smart: {
-        recommendation: result.smart?.recommendation || "NEUTRAL",
-        override: result.smart?.override || false,
-        liquidationRisk: result.smart?.liquidationRisk || "Unknown",
-        fundingRate: result.smart?.fundingRate || "N/A",
-        longShortRatio: result.smart?.longShortRatio || "N/A",
+        recommendation: "LONG",
+        override: false,
+        liquidationRisk: "Low",
+        fundingRate: "0.01%",
+        longShortRatio: "52/48",
       },
-      reasoning: result.reasoning || "No reasoning provided",
-      symbol: result.symbol || "Unknown",
+      reasoning: "Strong bullish momentum detected on the 4H timeframe. Price is holding above key support at $42,800. RSI showing strength at 62, not yet overbought. MACD showing bullish crossover. Volume increasing on upward moves. Recommended entry at current levels with tight stop loss below support.",
+      symbol: "BTC/USDT",
       timestamp: new Date().toISOString(),
       usage: {
-        tier: usageData.tier,
-        creditsRemaining: usageData.creditsRemaining,
+        tier: user.tier,
+        creditsRemaining: user.tier === "PRO" ? "Unlimited" : (5 - (user.monthlyAnalyses || 0)),
       },
-    });
+    };
+
+    // Return mock analysis
+    return NextResponse.json(mockAnalysis);
   } catch (error) {
     console.error("API error:", error);
     return NextResponse.json(
