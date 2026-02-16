@@ -68,12 +68,14 @@ export default function Home() {
               </p>
             </Card>
             
-            <Card className="p-6 space-y-4">
-              <TrendingUp className="h-10 w-10 text-primary" />
-              <h3 className="text-lg font-semibold">Track Record</h3>
-              <p className="text-sm text-muted-foreground">
-                100% transparent. All signals shown publicly. See our real win rate, not marketing fluff.
-              </p>
+            <Card className="p-6 space-y-4" asChild>
+              <Link href="/track-record">
+                <TrendingUp className="h-10 w-10 text-primary" />
+                <h3 className="text-lg font-semibold">Track Record</h3>
+                <p className="text-sm text-muted-foreground">
+                  100% transparent. All signals shown publicly. See our real win rate, not marketing fluff.
+                </p>
+              </Link>
             </Card>
           </div>
         </div>
