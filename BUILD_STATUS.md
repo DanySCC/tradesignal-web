@@ -1,22 +1,23 @@
 # TradeSignal AI Web Platform — Build Status
 
-**Version**: v0.9.0  
-**Last Updated**: 2026-02-16 15:48 GMT+1  
-**Status**: 🟢 Production-ready (pending API keys)
+**Version**: v0.10.0  
+**Last Updated**: 2026-02-16 16:05 GMT+1  
+**Status**: 🟢 Production-ready (pending API keys & testing)
 
 ---
 
 ## 📊 Progress Overview
 
-**Timeline**: Started Feb 15 (23:13 GMT+1) → Now (Feb 16, 15:48 GMT+1)  
-**Build Time**: ~17 hours across 2 days  
+**Timeline**: Started Feb 15 (23:13 GMT+1) → Now (Feb 16, 16:05 GMT+1)  
+**Build Time**: ~17.5 hours across 2 days  
 **Current Phase**: Testing & Deployment
 
 ```
-MVP Progress: ████████████████████░ 95%
+MVP Progress: ████████████████████░ 98%
 
 ✅ Core Features    ████████████████████ 100%
 ✅ Payment System   ████████████████████ 100%
+✅ Backend APIs     ████████████████████ 100%
 ✅ Documentation    ████████████████████ 100%
 ⏳ API Keys         ░░░░░░░░░░░░░░░░░░░░  0%
 ⏳ Testing          ░░░░░░░░░░░░░░░░░░░░  0%
@@ -164,17 +165,26 @@ NEXTAUTH_SECRET=... (generate with: openssl rand -base64 32)
 
 ---
 
-### 3. Backend Integration
+### 3. Backend Integration ✅ COMPLETE
 
 **TradeSignal Bot Connection**:
 - ✅ Chart analysis API connected
-- ⏳ Daily picks API needs testing
-- ⏳ Track record API needs testing
+- ✅ Daily picks API connected to MongoDB
+- ✅ Track record API connected to MongoDB
 
-**Database**:
+**Database Collections**:
 - ✅ MongoDB connected
-- ✅ User model (email, name, tier, usage)
-- ⏳ Need to verify payment webhooks update user tier
+- ✅ `users` — User accounts (email, name, tier, usage)
+- ✅ `dailysignals` — Published daily trading signals (3-5 per day)
+- ✅ `tradesignals` — Historical trade analyses & outcomes
+- ✅ Payment webhooks update user tier (Stripe + NOWPayments)
+
+**API Endpoints**:
+- ✅ `/api/daily-picks` — Fetch today's signals (PRO-only)
+- ✅ `/api/track-record` — Fetch performance history (public)
+- ✅ View count tracking for daily signals
+- ✅ Win rate & R:R stats calculation
+- ✅ Pagination support (limit/skip)
 
 ---
 
