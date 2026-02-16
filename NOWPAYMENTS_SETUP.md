@@ -1,338 +1,350 @@
-# NOWPayments Integration Setup Guide
+# NOWPayments Setup Guide
 
-## What is NOWPayments?
+This guide walks you through setting up NOWPayments cryptocurrency payment processing for TradeSignal AI.
 
-NOWPayments is a crypto payment gateway that supports **150+ cryptocurrencies**. It's what **CoinGlass** uses for their $299/month subscriptions.
+---
 
-**Why NOWPayments:**
-- ✅ 150+ cryptocurrencies (BTC, ETH, USDT, SOL, XRP, DOGE, and 144 more)
-- ✅ **0.5% fee** (vs Stripe's 2.9% - you keep $2 more per $79 payment!)
-- ✅ Non-custodial (crypto goes directly to your wallet)
-- ✅ No KYC required (for most amounts)
-- ✅ Subscriptions supported
-- ✅ White-label solution
+## Why NOWPayments?
+
+**Lower Fees**: 0.5% vs Stripe's 2.9% + $0.30  
+**More Options**: 150+ cryptocurrencies vs Stripe's limited crypto support  
+**Crypto-Native**: Direct crypto payments without conversion  
+
+**Cost Comparison (per $79 transaction)**:
+- Stripe: You receive **$76.41** (2.9% + $0.30 = $2.59 fee)
+- NOWPayments: You receive **$78.60** (0.5% = $0.40 fee)
+- **Savings**: $2.19 per transaction (85% lower fees!)
 
 ---
 
 ## Step 1: Create NOWPayments Account
 
 1. Go to https://nowpayments.io
-2. Click **"Sign Up"**
-3. Enter email + password
-4. Verify email
-5. Complete account setup
-
-**Free to sign up!** No monthly fees.
+2. Click **"Sign Up"** (top right)
+3. Fill in:
+   - Email address
+   - Strong password
+   - Agree to Terms of Service
+4. Click **"Create Account"**
+5. **Verify your email** (check inbox/spam)
+6. **Complete KYC** (may be required for higher limits):
+   - Personal info
+   - Business details (if applicable)
+   - Upload ID documents
 
 ---
 
 ## Step 2: Get API Key
 
-1. Login to https://account.nowpayments.io
-2. Go to **"Settings"** → **"API Keys"**
-3. Click **"Generate API Key"**
-4. Copy the API key (starts with `YOUR_API_KEY...`)
-5. Update `.env.local`:
-   ```env
-   NOWPAYMENTS_API_KEY=YOUR_API_KEY_HERE
+1. Log in to NOWPayments dashboard
+2. Navigate to **Settings** → **API Keys**
+3. Click **"Generate New API Key"**
+4. **Copy the API key** (starts with something like `ABC123...`)
+5. **Store it securely** — you won't see it again!
+
+---
+
+## Step 3: Configure IPN (Instant Payment Notification)
+
+IPN is how NOWPayments notifies your server when a payment is completed.
+
+### 3.1 Get IPN Secret
+
+1. In NOWPayments dashboard, go to **Settings** → **IPN**
+2. Click **"Generate IPN Secret"**
+3. **Copy the IPN secret** (long string like `abc123def456...`)
+4. Store it securely
+
+### 3.2 Set IPN Callback URL
+
+1. In the same IPN settings page, enter your callback URL:
+   ```
+   https://yourdomain.com/api/webhooks/nowpayments
+   ```
+   
+   **For local testing**:
+   ```
+   http://localhost:3000/api/webhooks/nowpayments
+   ```
+   
+   ⚠️ **Note**: NOWPayments requires HTTPS in production. Use ngrok for local testing:
+   ```bash
+   ngrok http 3000
+   # Use the https URL provided: https://abc123.ngrok.io/api/webhooks/nowpayments
    ```
 
+2. Click **"Save"**
+
 ---
 
-## Step 3: Set Up IPN (Webhook)
+## Step 4: Update Environment Variables
 
-IPN = Instant Payment Notification (like Stripe webhooks)
+Add the following to your `.env.local` file:
 
-1. In NOWPayments dashboard → **"Settings"** → **"IPN"**
-2. **IPN Callback URL:** `https://yourdomain.com/api/webhooks/nowpayments`
-   - For local testing: Use ngrok (see below)
-3. Click **"Generate IPN Secret"**
-4. Copy the IPN secret
-5. Update `.env.local`:
-   ```env
-   NOWPAYMENTS_IPN_SECRET=YOUR_IPN_SECRET_HERE
+```bash
+# NOWPayments Configuration
+NOWPAYMENTS_API_KEY=your_api_key_here
+NOWPAYMENTS_IPN_SECRET=your_ipn_secret_here
+
+# Your app URL (for IPN callbacks)
+NEXT_PUBLIC_APP_URL=http://localhost:3000  # Change to your domain in production
+NEXTAUTH_URL=http://localhost:3000         # Same as above
+```
+
+**Replace**:
+- `your_api_key_here` → Your actual API key from Step 2
+- `your_ipn_secret_here` → Your actual IPN secret from Step 3
+- `http://localhost:3000` → Your production domain (e.g., `https://tradesignalai.com`)
+
+---
+
+## Step 5: Test Crypto Payments
+
+### 5.1 Use Sandbox Mode (Optional)
+
+NOWPayments offers sandbox mode for testing without real crypto:
+
+1. In dashboard, go to **Settings** → **Sandbox**
+2. Enable **"Sandbox Mode"**
+3. Get sandbox API key (different from production)
+4. Update `.env.local`:
+   ```bash
+   NOWPAYMENTS_API_KEY=sandbox_key_here
+   NOWPAYMENTS_API_URL=https://api-sandbox.nowpayments.io/v1
    ```
 
----
+### 5.2 Test with Real Crypto (Small Amount)
 
-## Step 4: Configure Wallet Address
-
-Where should crypto payments go?
-
-1. In NOWPayments dashboard → **"Settings"** → **"Wallet Settings"**
-2. Add wallet addresses for cryptocurrencies you want to accept:
-   - **Bitcoin (BTC):** Your BTC wallet address
-   - **Ethereum (ETH):** Your ETH wallet address
-   - **USDT (TRC20):** Your USDT (Tron) address
-   - **USDC (ERC20):** Your USDC (Ethereum) address
-   - etc.
-
-**Recommendation:** Start with these top 5:
-1. **BTC** - Most popular
-2. **ETH** - Second most popular
-3. **USDT** - Stablecoin (no volatility)
-4. **USDC** - Stablecoin (no volatility)
-5. **SOL** - Popular with traders
-
-**Pro tip:** Use stablecoins (USDT, USDC) if you want to avoid crypto volatility!
-
----
-
-## Step 5: Test the Integration
-
-### Local Testing with ngrok:
-
-1. Install ngrok: https://ngrok.com/download
-2. Start dev server:
+1. Start your dev server:
    ```bash
    npm run dev
    ```
-3. In another terminal, expose local server:
-   ```bash
-   ngrok http 3000
+
+2. Navigate to `http://localhost:3000/upgrade`
+
+3. Click **"Pay with Crypto"**
+
+4. Select a cryptocurrency (e.g., USDT TRC20 for low fees)
+
+5. Send a **small test amount** (e.g., $1 worth) to the provided address
+
+6. Wait for confirmation (usually 1-10 minutes depending on blockchain)
+
+7. Check your server logs for IPN webhook calls
+
+---
+
+## Step 6: Verify IPN Webhook
+
+When a payment is successful, NOWPayments sends an IPN to your server.
+
+### Check Webhook Logs
+
+Your webhook handler logs events at `/api/webhooks/nowpayments`:
+
+```bash
+# Terminal output when payment succeeds:
+[NOWPayments IPN] Payment finished for order: sub_123_1234567890
+[NOWPayments IPN] User upgraded: user@example.com
+```
+
+### Manual IPN Testing
+
+Use curl to simulate an IPN (replace with real data):
+
+```bash
+curl -X POST http://localhost:3000/api/webhooks/nowpayments \
+  -H "Content-Type: application/json" \
+  -H "x-nowpayments-sig: SIGNATURE_HERE" \
+  -d '{
+    "payment_id": "test_123",
+    "payment_status": "finished",
+    "order_id": "sub_user123_1234567890",
+    "pay_address": "TRX_ADDRESS_HERE",
+    "pay_amount": 79,
+    "pay_currency": "usdttrc20",
+    "price_amount": 79,
+    "price_currency": "usd"
+  }'
+```
+
+---
+
+## Step 7: Production Deployment
+
+### 7.1 Update Environment Variables
+
+When deploying to production (Vercel, Netlify, etc.), update these:
+
+```bash
+NOWPAYMENTS_API_KEY=production_api_key_here
+NOWPAYMENTS_IPN_SECRET=production_ipn_secret_here
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+NEXTAUTH_URL=https://yourdomain.com
+```
+
+### 7.2 Update IPN URL in NOWPayments Dashboard
+
+1. Go to NOWPayments dashboard → **Settings** → **IPN**
+2. Update callback URL to:
    ```
-4. Copy ngrok URL (e.g., `https://abc123.ngrok.io`)
-5. Update NOWPayments IPN URL to:
+   https://yourdomain.com/api/webhooks/nowpayments
    ```
-   https://abc123.ngrok.io/api/webhooks/nowpayments
-   ```
+3. Save
 
-### Test Payment:
+### 7.3 Enable Notifications (Optional)
 
-1. Go to http://localhost:3000/pricing
-2. Click **"Pay with Crypto"**
-3. Select cryptocurrency (e.g., BTC)
-4. NOWPayments invoice page opens
-5. **Sandbox mode:** Use test wallet to send crypto
-6. Wait for confirmation
-7. Webhook fires → User upgraded to PRO
-8. Redirected to success page
+1. In NOWPayments dashboard, go to **Settings** → **Notifications**
+2. Enable email notifications for:
+   - Successful payments
+   - Failed payments
+   - Refunds
 
 ---
 
-## Step 6: Production Deployment
+## Supported Cryptocurrencies
 
-1. Deploy app to production (Vercel, Netlify, etc.)
-2. Get production domain (e.g., `tradesignal.ai`)
-3. Update NOWPayments IPN URL:
-   ```
-   https://tradesignal.ai/api/webhooks/nowpayments
-   ```
-4. Update `.env` on production with real API keys
-5. Test with small amount first!
+The checkout UI currently shows these popular coins:
 
----
+- Bitcoin (BTC)
+- Ethereum (ETH)
+- Tether USDT (TRC20) — **Recommended** (low fees, stable)
+- Tether USDT (ERC20)
+- Litecoin (LTC)
+- Tron (TRX) — **Recommended** (very low fees)
+- BNB (BSC)
+- Solana (SOL)
 
-## Supported Cryptocurrencies (Top 20)
-
-| Crypto | Symbol | Popular? | Stablecoin? |
-|--------|--------|----------|-------------|
-| Bitcoin | BTC | ⭐⭐⭐⭐⭐ | ❌ |
-| Ethereum | ETH | ⭐⭐⭐⭐⭐ | ❌ |
-| Tether | USDT | ⭐⭐⭐⭐⭐ | ✅ |
-| USD Coin | USDC | ⭐⭐⭐⭐ | ✅ |
-| Binance Coin | BNB | ⭐⭐⭐⭐ | ❌ |
-| Solana | SOL | ⭐⭐⭐⭐ | ❌ |
-| XRP | XRP | ⭐⭐⭐ | ❌ |
-| Cardano | ADA | ⭐⭐⭐ | ❌ |
-| Dogecoin | DOGE | ⭐⭐⭐ | ❌ |
-| Polygon | MATIC | ⭐⭐⭐ | ❌ |
-| Litecoin | LTC | ⭐⭐⭐ | ❌ |
-| Tron | TRX | ⭐⭐ | ❌ |
-| Avalanche | AVAX | ⭐⭐ | ❌ |
-| Polkadot | DOT | ⭐⭐ | ❌ |
-| Chainlink | LINK | ⭐⭐ | ❌ |
-
-**150+ total cryptocurrencies available!**
-
----
-
-## Payment Flow
-
-### User Journey:
-
-1. **Pricing page** → Click "Pay with Crypto (150+ coins)"
-2. **Crypto selector** appears → Choose cryptocurrency (e.g., USDT)
-3. **NOWPayments invoice** page opens
-4. **Payment details** shown:
-   - Amount: $79 USD = 79.25 USDT (example)
-   - Wallet address to send to
-   - QR code
-   - Timer (usually 30 minutes to pay)
-5. **User sends crypto** from their wallet
-6. **Blockchain confirms** transaction
-7. **Webhook fires** → User upgraded to PRO
-8. **Redirect** to success page
-
-**Time:** Usually 2-10 minutes (depending on blockchain)
-
----
-
-## Fees Breakdown
-
-| Item | NOWPayments | Stripe (for comparison) |
-|------|-------------|-------------------------|
-| Transaction Fee | 0.5% | 2.9% + $0.30 |
-| Monthly Fee | $0 | $0 |
-| Setup Fee | $0 | $0 |
-| Payout | Instant | 2-7 days |
-
-**For $79 payment:**
-- NOWPayments: You receive **$78.60** (0.5% fee)
-- Stripe: You receive **$76.41** (2.9% + $0.30)
-- **You save $2.19 per payment!**
-
----
-
-## Advanced Features
-
-### Auto-Convert to Stablecoins:
-
-1. In NOWPayments dashboard → **"Settings"** → **"Auto-conversion"**
-2. Enable auto-conversion
-3. Select: Convert all to **USDT** or **USDC**
-4. Result: Users pay in any crypto, you receive stablecoin!
-
-**Why:** No crypto volatility risk. $79 paid = $79 received (in stablecoin).
-
-### Minimum Payment Amount:
-
-Set minimum to $79 (subscription price) to avoid partial payments.
-
-### Custom Branding:
-
-1. Add your logo
-2. Customize colors
-3. White-label the payment page
-
----
-
-## Security Best Practices
-
-1. ✅ **Always verify IPN signature** (we do this in webhook handler)
-2. ✅ **Use separate wallet** for business (not personal)
-3. ✅ **Monitor webhook logs** (check for failed payments)
-4. ✅ **Set up alerts** for large payments
-5. ✅ **Use stablecoins** if you want to avoid volatility
+**Total supported**: 150+ coins (full list in NOWPayments dashboard)
 
 ---
 
 ## Troubleshooting
 
-### "Payment pending forever"
+### Issue: IPN Not Received
 
-**Cause:** Blockchain congestion or low gas fee
+**Check**:
+1. Is your server publicly accessible? (ngrok for local testing)
+2. Is the IPN URL correct in NOWPayments dashboard?
+3. Are you using HTTPS in production?
+4. Check server logs for incoming requests
 
-**Solution:**
-- Bitcoin: Wait 10-60 minutes
-- Ethereum: Wait 2-15 minutes
-- Stablecoins: Usually fast (2-5 minutes)
-
-### "Webhook not firing"
-
-**Cause:** IPN URL not configured or unreachable
-
-**Solution:**
-1. Check NOWPayments dashboard → IPN settings
-2. Verify URL is correct
-3. Test webhook: `curl -X POST https://yourdomain.com/api/webhooks/nowpayments`
-4. Check server logs
-
-### "User paid but not upgraded"
-
-**Cause:** Webhook signature verification failed or database error
-
-**Solution:**
-1. Check server logs for errors
-2. Verify IPN secret in `.env`
-3. Manual upgrade: Update user tier in MongoDB
+**Solution**: Test with ngrok:
+```bash
+ngrok http 3000
+# Use https://abc123.ngrok.io/api/webhooks/nowpayments in NOWPayments dashboard
+```
 
 ---
 
-## Monitoring & Analytics
+### Issue: Signature Verification Failed
 
-1. **NOWPayments Dashboard:**
-   - See all payments
-   - Export reports
-   - Track revenue
+**Check**:
+1. Is `NOWPAYMENTS_IPN_SECRET` set correctly in `.env.local`?
+2. Did you copy the IPN secret exactly (no extra spaces)?
 
-2. **MongoDB:**
-   - Query users with `subscriptionMethod: "crypto"`
-   - Track crypto revenue vs card revenue
-
-3. **Webhook Logs:**
-   - Monitor IPN events
-   - Debug failed payments
+**Solution**:
+1. Regenerate IPN secret in NOWPayments dashboard
+2. Update `.env.local` with new secret
+3. Restart your dev server
 
 ---
 
-## Subscription Renewals
+### Issue: Payment Not Creating
 
-**Important:** NOWPayments doesn't handle automatic recurring payments (like Stripe does).
+**Check**:
+1. Is `NOWPAYMENTS_API_KEY` set correctly?
+2. Are you using the correct API URL (sandbox vs production)?
+3. Check browser console for errors
+4. Check server logs for API errors
 
-**Options:**
-
-1. **Manual renewal:**
-   - User pays again each month
-   - Send reminder email before expiry
-
-2. **Hybrid approach:**
-   - First month: Crypto payment (NOWPayments)
-   - Recurring: Switch to Stripe for auto-renewal
-   - (Or keep crypto users on monthly manual payments)
-
-**Recommendation:** Crypto payments = one-time or manual monthly. Stripe = automatic recurring.
+**Solution**:
+1. Verify API key in NOWPayments dashboard
+2. Test API status:
+   ```bash
+   curl https://api.nowpayments.io/v1/status \
+     -H "x-api-key: YOUR_API_KEY"
+   ```
 
 ---
 
-## Cost Savings Calculator
+## Payment Flow Diagram
 
-If 10% of your users pay with crypto:
+```
+User clicks "Pay with Crypto"
+    ↓
+Frontend calls /api/crypto-checkout (POST)
+    ↓
+Backend creates invoice via NOWPayments API
+    ↓
+User sees payment address + amount
+    ↓
+User sends crypto to address
+    ↓
+NOWPayments detects payment
+    ↓
+IPN webhook fires → /api/webhooks/nowpayments
+    ↓
+Backend upgrades user to PRO
+    ↓
+User redirected to /payment/success
+```
 
-| Users | Monthly Revenue | NOWPayments Fees | Stripe Fees | Savings |
-|-------|-----------------|------------------|-------------|---------|
-| 10 | $790 | $3.95 | $22.89 | **$18.94/mo** |
-| 50 | $3,950 | $19.75 | $114.49 | **$94.74/mo** |
-| 100 | $7,900 | $39.50 | $228.99 | **$189.49/mo** |
+---
 
-**Annual savings (100 users):** $2,273.88!
+## Security Best Practices
+
+1. **Always verify IPN signatures** (already implemented in webhook handler)
+2. **Use HTTPS in production** (required by NOWPayments)
+3. **Don't expose API keys** (use environment variables)
+4. **Log all payments** (for audit trail)
+5. **Handle refunds properly** (IPN webhook handles this)
+
+---
+
+## Additional Resources
+
+- **NOWPayments Docs**: https://documenter.getpostman.com/view/7907941/2s93JRVFUW
+- **API Status**: https://api.nowpayments.io/v1/status
+- **Support**: https://nowpayments.io/contact-us
+- **Dashboard**: https://account.nowpayments.io
+
+---
+
+## Cost Analysis
+
+### Monthly Revenue: $7,900 (100 PRO subscriptions)
+
+**Stripe Only**:
+- Fees: $259 (2.9% + $0.30 per transaction)
+- Net: $7,641
+
+**50% Stripe + 50% NOWPayments**:
+- Stripe fees: $129.50 (50 transactions)
+- NOWPayments fees: $20 (50 transactions)
+- **Total fees**: $149.50
+- **Net**: $7,750.50
+- **Savings**: $109.50/month ($1,314/year)
+
+**25% Stripe + 75% NOWPayments**:
+- Stripe fees: $64.75 (25 transactions)
+- NOWPayments fees: $30 (75 transactions)
+- **Total fees**: $94.75
+- **Net**: $7,805.25
+- **Savings**: $164.25/month ($1,971/year)
+
+**Recommendation**: Promote crypto payments to save 60-85% on fees!
 
 ---
 
 ## Next Steps
 
-### This Week:
-1. ✅ Sign up at https://nowpayments.io
-2. ✅ Get API key
-3. ✅ Set up IPN callback
-4. ✅ Add wallet addresses (start with BTC, ETH, USDT)
-5. ✅ Test with ngrok + small amount
+1. ✅ Create NOWPayments account
+2. ✅ Get API key and IPN secret
+3. ✅ Update `.env.local`
+4. ✅ Configure IPN callback URL
+5. ✅ Test with small crypto payment
+6. ✅ Deploy to production
+7. ✅ Monitor payments in NOWPayments dashboard
 
-### Production:
-6. Update IPN URL to production domain
-7. Test with real payment (small amount)
-8. Monitor for 1 week
-9. Promote crypto option to users!
-
----
-
-## Support
-
-- **NOWPayments Docs:** https://documenter.getpostman.com/view/7907941/2s93JRVFUW
-- **Support:** support@nowpayments.io
-- **Live Chat:** Available in dashboard
-
----
-
-## Summary
-
-**TL;DR:**
-1. Sign up at nowpayments.io (free)
-2. Get API key + IPN secret
-3. Add wallet addresses
-4. Test locally with ngrok
-5. Deploy to production
-6. Users can pay with 150+ cryptocurrencies
-7. You keep 99.5% (vs 97.1% with Stripe)
-
-**Status:** ✅ Code ready! Just need your NOWPayments account!
+**Ready to go live!** 🚀

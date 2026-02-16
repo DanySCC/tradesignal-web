@@ -50,9 +50,28 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get supported cryptocurrencies
+// Get payment status or supported cryptocurrencies
 export async function GET(request: NextRequest) {
   try {
+    const searchParams = request.nextUrl.searchParams;
+    const paymentId = searchParams.get('payment_id');
+
+    // If payment_id is provided, return payment status
+    if (paymentId) {
+      const session = await getServerSession(authOptions);
+      
+      if (!session || !session.user) {
+        return NextResponse.json(
+          { error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      const status = await nowPayments.getPaymentStatus(paymentId);
+      return NextResponse.json(status);
+    }
+
+    // Otherwise, return available currencies
     const currencies = await nowPayments.getAvailableCurrencies();
     
     // Filter to popular ones for better UX
@@ -70,9 +89,9 @@ export async function GET(request: NextRequest) {
       allCurrencies: currencies.currencies.length,
     });
   } catch (error: any) {
-    console.error("Get currencies error:", error);
+    console.error("Get currencies/status error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch currencies" },
+      { error: "Failed to fetch data" },
       { status: 500 }
     );
   }

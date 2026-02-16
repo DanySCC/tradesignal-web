@@ -136,7 +136,7 @@ export default function PricingPage() {
             </ul>
 
             <Button size="lg" className="w-full" asChild>
-              <Link href="/auth/signup">Start PRO Trial</Link>
+              <Link href="/upgrade">Upgrade to PRO</Link>
             </Button>
 
             <p className="text-center text-sm text-muted-foreground mt-4">
