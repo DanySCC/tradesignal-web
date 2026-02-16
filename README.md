@@ -32,8 +32,8 @@ tradesignal-web/
 
 ## 🎯 Current Status
 
-**Phase:** MVP Development (Week 1-2)  
-**Version:** 0.4.0 (Full Authentication + Pricing)
+**Phase:** MVP Development (Week 1-3)  
+**Version:** 0.5.0 (Daily Picks + Full Features)
 
 ### ✅ Completed
 - [x] Next.js project setup with TypeScript
@@ -56,14 +56,16 @@ tradesignal-web/
 - [x] **Usage tracking (FREE 5/month vs PRO unlimited)**
 - [x] **Pricing page (/pricing with FAQ)**
 - [x] **Working navigation (all links functional)**
+- [x] **Daily picks page (/daily-picks) - PRO feature**
+- [x] **Daily picks API integration with backend**
 
 ### 🚧 In Progress
-- [ ] Daily picks feed (Week 2)
 - [ ] Track record page (Week 3-4)
 - [ ] Position size calculator (Week 3-4)
 - [ ] Payment integration (Stripe)
 - [ ] Backend connection testing
 - [ ] Mobile responsive refinement
+- [ ] Deploy to production
 
 ### 📋 Roadmap
 
