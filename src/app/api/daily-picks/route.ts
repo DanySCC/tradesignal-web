@@ -33,60 +33,69 @@ export async function GET(request: NextRequest) {
     // Daily picks are PRO-only feature
     if (user.tier !== "PRO") {
       return NextResponse.json(
-        { error: "Daily picks are only available for PRO users" },
+        { error: "Daily picks are only available for PRO users. Upgrade to PRO to access 3 curated signals every day." },
         { status: 403 }
       );
     }
 
-    // Fetch today's daily picks
+    // Get today's published daily signal
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    today.setUTCHours(0, 0, 0, 0);
 
-    const dailySignals = await db
-      .collection("dailysignals")
-      .find({
-        date: {
-          $gte: today,
-          $lt: tomorrow,
-        },
-      })
-      .sort({ createdAt: -1 })
-      .limit(1)
-      .toArray();
+    let dailySignal = await db.collection("dailysignals").findOne({
+      date: today,
+      published: true,
+    });
 
-    if (!dailySignals || dailySignals.length === 0) {
-      return NextResponse.json({
-        picks: [],
-        message: "No daily picks available yet",
-      });
+    // If no signal for today, get the most recent published signal
+    if (!dailySignal) {
+      const recentSignals = await db
+        .collection("dailysignals")
+        .find({ published: true })
+        .sort({ date: -1 })
+        .limit(1)
+        .toArray();
+
+      if (!recentSignals || recentSignals.length === 0) {
+        return NextResponse.json({
+          picks: [],
+          date: today.toISOString().split("T")[0],
+          message: "No daily picks available yet. Our AI is analyzing the markets. Check back soon!",
+        });
+      }
+
+      dailySignal = recentSignals[0];
     }
 
-    const latestSignal = dailySignals[0];
-    const picks = latestSignal.signals.map((signal: any, index: number) => ({
-      id: `${latestSignal._id}-${index}`,
+    // Increment view count
+    await db.collection("dailysignals").updateOne(
+      { _id: dailySignal._id },
+      { $inc: { viewCount: 1 } }
+    );
+
+    // Map signals to frontend format
+    const picks = dailySignal.signals.map((signal: any) => ({
+      id: signal._id?.toString() || Math.random().toString(36),
       symbol: signal.symbol,
-      timeframe: signal.timeframe || "1h",
-      recommendation: signal.recommendation,
+      timeframe: signal.timeframe,
+      direction: signal.recommendation,
       confidence: signal.confidence,
-      entry: signal.entry || "Market",
-      stopLoss: signal.stopLoss || "N/A",
-      takeProfit: signal.takeProfit || "N/A",
-      reasoning: signal.reasoning || "Technical analysis + SMART engine validation",
-      timestamp: latestSignal.createdAt || new Date().toISOString(),
+      technicalAnalysis: signal.technicalAnalysis,
+      coinglassData: signal.coinglassData,
+      timestamp: dailySignal.date,
     }));
 
     return NextResponse.json({
       picks,
-      date: latestSignal.date,
-      generatedAt: latestSignal.createdAt,
+      date: new Date(dailySignal.date).toISOString().split("T")[0],
+      publishedAt: dailySignal.publishedAt,
+      viewCount: dailySignal.viewCount || 0,
+      isToday: dailySignal.date.getTime() === today.getTime(),
     });
   } catch (error) {
-    console.error("Daily picks error:", error);
+    console.error("Daily picks API error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to fetch daily picks" },
       { status: 500 }
     );
   }
