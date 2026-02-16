@@ -32,8 +32,8 @@ tradesignal-web/
 
 ## 🎯 Current Status
 
-**Phase:** MVP Development + Payment Integration  
-**Version:** 0.8.0 (Production-Ready with Stripe Payments!)
+**Phase:** MVP Development + Full Payment Suite  
+**Version:** 0.9.0 (ALL Payment Methods: Cards + Apple/Google Pay + 150+ Cryptos!)
 
 ### ✅ Completed
 - [x] Next.js project setup with TypeScript
@@ -66,11 +66,17 @@ tradesignal-web/
 - [x] **Checkout flow with Stripe Checkout**
 - [x] **Webhook handler for payment events**
 - [x] **Auto-upgrade/downgrade user tiers**
+- [x] **Apple Pay + Google Pay support (via Stripe)**
+- [x] **NOWPayments integration (150+ cryptocurrencies)**
+- [x] **Crypto webhook handler with signature verification**
+- [x] **CryptoCheckoutButton component**
 
 ### 🚧 Ready for Production
 - [ ] Track record backend API integration
 - [ ] Daily picks backend API integration
 - [ ] **Add real Stripe API keys (see STRIPE_SETUP.md)**
+- [ ] **Enable Apple Pay + Google Pay in Stripe Dashboard (5 min)**
+- [ ] **Get NOWPayments API key (see NOWPAYMENTS_SETUP.md)**
 - [ ] Backend connection end-to-end testing
 - [ ] Production deployment (Vercel/Netlify)
 - [ ] Domain setup + SSL
