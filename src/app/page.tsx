@@ -45,8 +45,8 @@ export default function Home() {
             <Button size="lg" className="text-lg px-8" asChild>
               <Link href="/analyze">Analyze Chart Now</Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8">
-              View Daily Picks
+            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+              <Link href="/daily-picks">View Daily Picks</Link>
             </Button>
           </div>
 

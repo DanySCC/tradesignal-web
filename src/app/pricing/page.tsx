@@ -22,6 +22,9 @@ export default function PricingPage() {
               <Link href="/analyze">Analyze</Link>
             </Button>
             <Button variant="ghost" asChild>
+              <Link href="/daily-picks">Daily Picks</Link>
+            </Button>
+            <Button variant="ghost" asChild>
               <Link href="/auth/signin">Sign In</Link>
             </Button>
             <ThemeToggle />

@@ -112,8 +112,15 @@ export default function AnalyzePage() {
             <Button variant="ghost" asChild>
               <Link href="/">Home</Link>
             </Button>
-            <Button variant="ghost">Pricing</Button>
-            <Button variant="ghost">Sign In</Button>
+            <Button variant="ghost" asChild>
+              <Link href="/daily-picks">Daily Picks</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/pricing">Pricing</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/auth/signin">Sign In</Link>
+            </Button>
             <ThemeToggle />
           </div>
         </div>
