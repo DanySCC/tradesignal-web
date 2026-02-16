@@ -32,8 +32,8 @@ tradesignal-web/
 
 ## 🎯 Current Status
 
-**Phase:** MVP Development (Week 1-4 COMPLETE)  
-**Version:** 0.7.0 (Full MVP - All Features Complete!)
+**Phase:** MVP Development + Payment Integration  
+**Version:** 0.8.0 (Production-Ready with Stripe Payments!)
 
 ### ✅ Completed
 - [x] Next.js project setup with TypeScript
@@ -62,11 +62,15 @@ tradesignal-web/
 - [x] **Transparent signal tracking with win/loss display**
 - [x] **Position size calculator (/calculator) - risk management tool**
 - [x] **Complete navigation across all pages**
+- [x] **Stripe payment integration (PRO subscriptions)**
+- [x] **Checkout flow with Stripe Checkout**
+- [x] **Webhook handler for payment events**
+- [x] **Auto-upgrade/downgrade user tiers**
 
 ### 🚧 Ready for Production
 - [ ] Track record backend API integration
 - [ ] Daily picks backend API integration
-- [ ] Payment integration (Stripe) - requires API keys
+- [ ] **Add real Stripe API keys (see STRIPE_SETUP.md)**
 - [ ] Backend connection end-to-end testing
 - [ ] Production deployment (Vercel/Netlify)
 - [ ] Domain setup + SSL
