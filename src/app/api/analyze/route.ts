@@ -1,10 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 // Backend API URL (TradeSignal bot)
 const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:3001";
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: "Unauthorized. Please sign in." },
+        { status: 401 }
+      );
+    }
+
+    // Check and consume usage credit
+    const usageResponse = await fetch(
+      `${request.nextUrl.origin}/api/usage/consume`,
+      {
+        method: "POST",
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+      }
+    );
+
+    if (!usageResponse.ok) {
+      const error = await usageResponse.json();
+      return NextResponse.json(
+        { error: error.error || "Usage limit exceeded" },
+        { status: usageResponse.status }
+      );
+    }
+
+    const usageData = await usageResponse.json();
+
     const formData = await request.formData();
     const file = formData.get("chart") as File;
 
@@ -52,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const result = await response.json();
 
-    // Return analysis result
+    // Return analysis result with usage data
     return NextResponse.json({
       technical: {
         bias: result.technical?.bias || "NEUTRAL",
@@ -71,6 +103,10 @@ export async function POST(request: NextRequest) {
       reasoning: result.reasoning || "No reasoning provided",
       symbol: result.symbol || "Unknown",
       timestamp: new Date().toISOString(),
+      usage: {
+        tier: usageData.tier,
+        creditsRemaining: usageData.creditsRemaining,
+      },
     });
   } catch (error) {
     console.error("API error:", error);

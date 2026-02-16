@@ -32,8 +32,8 @@ tradesignal-web/
 
 ## 🎯 Current Status
 
-**Phase:** MVP Development (Week 1)  
-**Version:** 0.2.0 (Core Features)
+**Phase:** MVP Development (Week 1-2)  
+**Version:** 0.3.0 (Authentication + Core Features)
 
 ### ✅ Completed
 - [x] Next.js project setup with TypeScript
@@ -49,10 +49,15 @@ tradesignal-web/
 - [x] **Analysis API route (/api/analyze)**
 - [x] **Backend integration (TradeSignal bot)**
 - [x] **Results display (Technical + SMART)**
+- [x] **Authentication system (NextAuth + MongoDB)**
+- [x] **Sign-in and sign-up pages**
+- [x] **User registration API**
 
 ### 🚧 In Progress
+- [ ] Protected routes (require auth for /analyze)
+- [ ] Usage tracking (FREE 5/month vs PRO unlimited)
+- [ ] Navigation updates (show user status)
 - [ ] Backend connection testing
-- [ ] Error handling polish
 - [ ] Mobile responsive refinement
 
 ### 📋 Roadmap
