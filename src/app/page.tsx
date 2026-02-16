@@ -1,33 +1,13 @@
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, Zap, Shield } from "lucide-react";
+import { Zap, Shield, BarChart3 } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">TradeSignal AI</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/analyze">Features</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link href="/pricing">Pricing</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link href="/auth/signin">Sign In</Link>
-            </Button>
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
@@ -70,7 +50,7 @@ export default function Home() {
             
             <Card className="p-6 space-y-4" asChild>
               <Link href="/track-record">
-                <TrendingUp className="h-10 w-10 text-primary" />
+                <BarChart3 className="h-10 w-10 text-primary" />
                 <h3 className="text-lg font-semibold">Track Record</h3>
                 <p className="text-sm text-muted-foreground">
                   100% transparent. All signals shown publicly. See our real win rate, not marketing fluff.
