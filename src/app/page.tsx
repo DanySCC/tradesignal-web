@@ -15,9 +15,15 @@ export default function Home() {
             <span className="text-xl font-bold">TradeSignal AI</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost">Features</Button>
-            <Button variant="ghost">Pricing</Button>
-            <Button variant="ghost">Sign In</Button>
+            <Button variant="ghost" asChild>
+              <Link href="/analyze">Features</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/pricing">Pricing</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/auth/signin">Sign In</Link>
+            </Button>
             <ThemeToggle />
           </div>
         </div>
