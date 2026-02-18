@@ -32,25 +32,25 @@ export default function Home() {
 
           {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-6 mt-16">
-            <Card className="p-6 space-y-4">
-              <Zap className="h-10 w-10 text-primary" />
+            <Card className="p-6 space-y-4 text-center">
+              <Zap className="h-10 w-10 text-primary mx-auto" />
               <h3 className="text-lg font-semibold">Instant Analysis</h3>
               <p className="text-sm text-muted-foreground">
                 Upload chart, get AI analysis in 3 seconds. LONG, SHORT, or NEUTRAL with confidence score.
               </p>
             </Card>
             
-            <Card className="p-6 space-y-4">
-              <Shield className="h-10 w-10 text-primary" />
+            <Card className="p-6 space-y-4 text-center">
+              <Shield className="h-10 w-10 text-primary mx-auto" />
               <h3 className="text-lg font-semibold">SMART Engine</h3>
               <p className="text-sm text-muted-foreground">
                 CoinGlass liquidation data validates technical analysis. Overrides when market data conflicts.
               </p>
             </Card>
             
-            <Card className="p-6 space-y-4" asChild>
+            <Card className="p-6 space-y-4 text-center" asChild>
               <Link href="/track-record">
-                <BarChart3 className="h-10 w-10 text-primary" />
+                <BarChart3 className="h-10 w-10 text-primary mx-auto" />
                 <h3 className="text-lg font-semibold">Track Record</h3>
                 <p className="text-sm text-muted-foreground">
                   100% transparent. All signals shown publicly. See our real win rate, not marketing fluff.
