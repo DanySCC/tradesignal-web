@@ -139,7 +139,7 @@ export default function UpgradePage() {
                         </div>
                       </div>
                     </div>
-                    <CheckoutButton priceId={STRIPE_PRO_PRICE_ID} />
+                    <CheckoutButton priceId={STRIPE_PRO_PRICE_ID} tier="PRO" />
                   </Card>
 
                   {/* Crypto Payment */}
