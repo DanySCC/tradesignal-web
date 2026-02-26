@@ -48,15 +48,15 @@ export default function Home() {
               </p>
             </Card>
             
-            <Card className="p-5 md:p-6 space-y-3 md:space-y-4 text-center" asChild>
-              <Link href="/track-record">
+            <Link href="/track-record" className="block">
+              <Card className="p-5 md:p-6 space-y-3 md:space-y-4 text-center hover:border-primary transition-colors cursor-pointer">
                 <BarChart3 className="h-8 md:h-10 w-8 md:w-10 text-primary mx-auto" />
                 <h3 className="text-base md:text-lg font-semibold">Track Record</h3>
                 <p className="text-xs md:text-sm text-muted-foreground">
                   100% transparent. All signals shown publicly. See our real win rate, not marketing fluff.
                 </p>
-              </Link>
-            </Card>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>
